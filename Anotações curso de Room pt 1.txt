@@ -1,0 +1,57 @@
+=========================================================
+		Anotações curso de Room pt 1
+=========================================================
+
+	o android possui 4 tipos diferentes de armazenagem de dados:
+		internal file storage: somente o aplicativo tem acesso
+		external internal file storage: pode usar fotos que seriam disponibilizadas nuam galeria (arquivos compartilhadas)
+		shared preferences: consegue armazenar arquivos primitivos (strings, int, etc...)
+		databases: conseguem armazenar dados estruturados (tabelas)
+
+	o android da uma api nativa que permite a utilização do SQLite. O Room  permite criar uma database mais abstraída (alto nível)
+	o Room utiliza o conceito de ORM (mapeamento objeto-relacional)
+	os 3 princiais componentes do Room:
+		database: a partir dele que fazemos todas as configurações do dB
+		Entity:  representa as entidades (faz com que a classe ex Alunos, se transforme na tabela da dB)
+		DAO (data access objects): interface que pega a entidade e o dB e faz os comportamentos de CRUD
+
+	ao inves de implementar os métodos abstratos, implementamos a clase abstrata para que o Room continue fazendo sentido, pois ele quem cria automaticamente os metodos
+
+	migration é uma tecnica muito comum em DB, ela permite que façamos modificações no DB atraves de técnicas de versionamento (ex cada versão tem uma estrutua diferente)
+
+	Usar a destruição de migration apenas durante o desenvolvimento e enquanto o App não for publicado
+
+	o SQLite usado pelo android não consegue usar o comando DROP, fazendo com que seja necessário realizar o procedimento de cópia para manter a integridade dos dados do usuário. Deve ser feito de outra maneira:
+		. criar uma nova tabela com as informações (colunas) desejadas
+	    . copiar dados da tabela antiga para a nova (query)
+	    . remoção da tabela antiga (deletar)
+	    . precisa renomear a tabela nova com o nome da tabela antiga
+
+	o SQLite não tem um suporte direto à adição de datas
+
+	Na maioria das situações em que utilizarmos classes que não representam tipos primitivos, o Room não vai saber salvar o dado automaticamente. Para isso precisamos fazer um tratamento dessa informação antes de salvar no banco
+
+	Em algumas situações, teremos entidades com atributos que não desejamos persistir no SQLite, em casos como esses, podemos anotar o atributo com @Ignore que o Room o ignora durante o processo do annotation processor
+
+
+=========================================================
+		Anotações curso de Room pt 2
+=========================================================
+
+	precisa ser feita a configuração de chave estrangeira para que permitimos o relacionamento entre entidades usando o Room (exemplo classe de Alunos, sendo cada aluno com uma classe que define seus números de telefone). para isso usamos a Foreig
+
+	o Room por padrão ele quebra o aplicativo se não colocarmos o .allowMainThreadQueries() logo no getInstance da Classe, junto dos .addMIgrations, visto que estamos usanod dB e esta operação tende a demorar. Portanto não devemos usar no dia-a-dia
+
+	a Thread principal (ou UI Thread) é a thread principal é que responsável em renderizar o app
+
+	as execuções que são demoradas, devem serem feitas numa thread paralela. Na principal, ficam as coisas que são síncronas, já a paralela é onde fica o processamento paralelo
+
+	o método .execute() do AsyncTask, faz com que tudo que esteja dentro do DoInBackground seja executado numa thread paralela
+
+	A partir da API 30 do Android (Android 11), a AsyncTask ficou obsoleta (deprecated). Como alternativa, a documentação sugere o uso das APIs do Java do pacote java.util.concurrent ou as Coroutines do Kotlin
+
+	não posso atualizar o conteudo da view principal dentro do doInBackground sendo que é uma thread paralela
+
+	o objeto criado onPostExecute recebe parâmetros que podem ser passados pelo doInBackground
+
+	sempre que estivermos trabalhando com algum tipo de asynctask, temos que evitar o envio de qualquer referencia que tenha contexto (referencia a uma activity)

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,16 +20,21 @@ import static br.com.alura.agenda.ui.activity.ConstantesActivities.CHAVE_ALUNO;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
+    public static final String LOG_TAG = "ListaAlunosActivity";
+
     private static final String TITULO_APPBAR = "Lista de alunos";
-    private final ListaAlunosView listaAlunosView = new ListaAlunosView(this);
+    private ListaAlunosView listaAlunosView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
         setTitle(TITULO_APPBAR);
+        listaAlunosView = new ListaAlunosView(this);
+        Log.d(LOG_TAG, "Inicializando");
         configuraFabNovoAluno();
         configuraLista();
+        // listaAlunosView.atualizaAlunos();
     }
 
     @Override
@@ -49,11 +56,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void configuraFabNovoAluno() {
+        Log.d(LOG_TAG, "configuraFabNovoAluno");
         FloatingActionButton botaoNovoAluno = findViewById(R.id.activity_lista_alunos_fab_novo_aluno);
         botaoNovoAluno.setOnClickListener(view -> abreFormularioModoInsereAluno());
     }
 
     private void abreFormularioModoInsereAluno() {
+        Log.d(LOG_TAG, "abreFormularioModoInsereAluno");
         startActivity(new Intent(this, FormularioAlunoActivity.class));
     }
 
@@ -64,6 +73,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void configuraLista() {
+        Log.d(LOG_TAG, "configuraLista");
         ListView listaDeAlunos = findViewById(R.id.activity_lista_alunos_listview);
         listaAlunosView.configuraAdapter(listaDeAlunos);
         configuraListenerDeCliquePorItem(listaDeAlunos);
@@ -78,6 +88,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void abreFormularioModoEditaAluno(Aluno aluno) {
+        Log.d(LOG_TAG, "abreFormularioModoEditaAluno: id " + aluno.getNome().toString());
         Intent vaiParaFormularioActivity = new Intent(ListaAlunosActivity.this, FormularioAlunoActivity.class);
         vaiParaFormularioActivity.putExtra(CHAVE_ALUNO, aluno);
         startActivity(vaiParaFormularioActivity);

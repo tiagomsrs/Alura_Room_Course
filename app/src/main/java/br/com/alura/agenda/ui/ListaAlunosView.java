@@ -2,16 +2,23 @@ package br.com.alura.agenda.ui;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import br.com.alura.agenda.dao.AlunoDAO;
+
+import br.com.alura.agenda.asynctask.BuscaAlunosTask;
+import br.com.alura.agenda.asynctask.RemoveAlunoTask;
+import br.com.alura.agenda.database.AgendaDatabase;
+import br.com.alura.agenda.database.dao.AlunoDAO;
 import br.com.alura.agenda.model.Aluno;
 import br.com.alura.agenda.ui.adapter.ListaAlunosAdapter;
 
 public class ListaAlunosView {
 
+
+    public static final String LOG_TAG = "ListaAlunosView";
     private final ListaAlunosAdapter adapter;
     private final AlunoDAO dao;
     private final Context context;
@@ -19,7 +26,9 @@ public class ListaAlunosView {
     public ListaAlunosView(Context context) {
         this.context = context;
         this.adapter = new ListaAlunosAdapter(this.context);
-        this.dao = new AlunoDAO();
+        dao = AgendaDatabase.getInstance(context)
+                            .getAlunoDAO(); // o nome do db deve ser o mesmo la
+
     }
 
     public void confirmaRemocao(final MenuItem item) {
@@ -38,15 +47,15 @@ public class ListaAlunosView {
     }
 
     public void atualizaAlunos() {
-        adapter.atualiza(dao.todos());
+        new BuscaAlunosTask(dao, adapter).execute();
     }
 
     private void remove(Aluno aluno) {
-        dao.remove(aluno);
-        adapter.remove(aluno);
+        new RemoveAlunoTask(dao, adapter, aluno).execute();
     }
 
     public void configuraAdapter(ListView listaDeAlunos) {
+        Log.d(LOG_TAG, "lista de alunos: " + listaDeAlunos);
         listaDeAlunos.setAdapter(adapter);
     }
 }
